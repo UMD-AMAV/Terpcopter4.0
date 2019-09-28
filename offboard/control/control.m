@@ -34,7 +34,7 @@ end
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 ayprCmdSubscriber = rossubscriber('/ayprCmd');
-controlStartSubscriber = rossubscriber('/startControl', 'std_msgs/Bool');
+% controlStartSubscriber = rossubscriber('/startControl', 'std_msgs/Bool');
 
 % Publishers
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
@@ -92,10 +92,10 @@ send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
 
 disp('Waiting for Start...')
-controlStartFlag = controlStartSubscriber.LatestMessage;
-while ( ~controlStartFlag.Data )
-    controlStartFlag = controlStartSubscriber.LatestMessage;
-end
+% controlStartFlag = controlStartSubscriber.LatestMessage;
+% while ( ~controlStartFlag.Data )
+%     controlStartFlag = controlStartSubscriber.LatestMessage;
+% end
 disp('Entering loop...');
 
 while(1)
