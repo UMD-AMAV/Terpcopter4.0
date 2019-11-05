@@ -15,7 +15,7 @@ A sample `36h11` tag image (tag size is 0.144m on a letter size paper) pdf can b
 This sample requires the [Apriltag library 3.1.1](https://github.com/AprilRobotics/apriltag/tree/3.1.1)  installed in the default location suggested by the library or a path specified in cmake variable `CMAKE_PREFIX_PATH`.
 
 ### Build Instructions 
-
+'''
 git clone https://github.com/IntelRealSense/librealsense.git
 cd librealsense
 mkdir build && mkdir install
@@ -38,7 +38,7 @@ mkdir apriltag-build
 cd apriltag-build
 cmake -DCMAKE_INSTALL_PREFIX=~/apriltag/ ../apriltag-3.1.1
 make install
-
+'''
 ## Next, switch to your librealsense build directory and add -DCMAKE_PREFIX_PATH to your cmake like to tell librealsense where to find the Apriltag library:
 
 cmake <librealsense_root_path> -DCMAKE_PREFIX_PATH=~/apriltag
