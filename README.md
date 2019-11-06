@@ -17,7 +17,7 @@ make
 This step will take some time(~20mins). Once the build finishes connect the 2 cameras(t265 and d435i) and run 
 ```
 cd examples/tracking-and-depth/
-sudo chmod u+x H\_t265\_d400.cfg
+sudo chmod u+x H_t265_d400.cfg
 ``` 
 This is to give permissions to the .cfg file which contains the transformation matrix between the t265 and d435. Now, run the code using:
 ```
