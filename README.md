@@ -27,3 +27,6 @@ This is to give permissions to the .cfg file which contains the transformation m
 ## Vision_To_Mavros
 
 https://github.com/thien94/vision_to_mavros
+
+## realsense ros guide (for arbitrary realsense camera)
+https://github.com/IntelRealSense/realsense-ros
