@@ -1,21 +1,7 @@
-function [completionFlag, ayprCmd] = bhv_CSVTest(stateEstimateMsg, ayprCmd, completion, t)
-    % Note: waypoint structure doesn't need to be global
+function completionFlag = bhv_waypoint3D(stateEstimateMsg, ayprCmd, completion, t )
     global timestamps
-    global waypoint
-    persistent k
+    toleranceMeters = 0.25;
     
-    % Initialize Incrementing Variable k
-    if isempty(k)
-    k = 1;
-    end
-    
-    % Initialize Current Waypoint
-    ayprCmd.WaypointXDesiredMeters = waypoint.waypoint_x(k);
-    ayprCmd.WaypointYDesiredMeters = waypoint.waypoint_y(k);
-    ayprCmd.AltDesiredMeters = waypoint.waypoint_z(k);
-    toleranceMeters = waypoint.ToleranceMeters;
-    
-    % Completion Conditions
     waypointXComplete = abs(ayprCmd.WaypointXDesiredMeters - stateEstimateMsg.East) <= toleranceMeters;
     waypointYComplete = abs(ayprCmd.WaypointYDesiredMeters - stateEstimateMsg.North) <= toleranceMeters;
     hoverAltComplete = abs(ayprCmd.AltDesiredMeters - stateEstimateMsg.Up) <= toleranceMeters;
@@ -36,11 +22,8 @@ function [completionFlag, ayprCmd] = bhv_CSVTest(stateEstimateMsg, ayprCmd, comp
     fprintf('Desired Altitude: %f meters\tCurrent Altitude %f meters\nDesired Time: %f\tElapsed time: %f\nDesired Position X: %f meters\tCurrent Position X: %f meters\nDesired Position Y: %f meters\tCurrent Position Y: %f meters\n', ayprCmd.AltDesiredMeters, stateEstimateMsg.Up, completion.durationSec, elapsed_satisfied_time,ayprCmd.WaypointXDesiredMeters, stateEstimateMsg.East,ayprCmd.WaypointYDesiredMeters, stateEstimateMsg.North);
     
     if elapsed_satisfied_time >= completion.durationSec
-        k=k+1;
-        if k == (waypoint.FinalWaypoint)
-            completionFlag = 1;
-            return;
-        end
+        completionFlag = 1;
+        return;
     end
     completionFlag = 0;
 end

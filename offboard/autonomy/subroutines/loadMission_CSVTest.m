@@ -1,12 +1,18 @@
 function mission = loadMission_CSVTest()
 global waypoint
-mission.config.firstLoop = 1;
+
+mission.config.Liveplot_toggle = 1; %1=on , 0=off
 
 mission.config.H_detector = 0;
 mission.config.R_detector = 0;
 mission.config.target_detector = 0;
 mission.config.flowProbe = 0;
 
+mission.config.Liveplot_firstloop = 1;
+waypoint.ToleranceMeters = 0.25;
+mission.config.toleranceMeters = waypoint.ToleranceMeters;
+
+mission.config.firstLoop = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Select Path to File and enter it
@@ -28,6 +34,10 @@ waypoint.waypoint_x = data1(:,1);
 waypoint.waypoint_y = data1(:,2);
 waypoint.waypoint_z = data1(:,3);
 waypoint.FinalWaypoint = length(waypoint.waypoint_time);
+mission.config.FinalWaypoint = waypoint.FinalWaypoint;
+mission.config.waypoint_x = waypoint.waypoint_x;
+mission.config.waypoint_y = waypoint.waypoint_y;
+mission.config.waypoint_z = waypoint.waypoint_z;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 i = 1;

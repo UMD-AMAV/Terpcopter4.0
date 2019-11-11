@@ -20,6 +20,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 % prepare workspace
 clear all; close all; clc; format compact;
 run('loadParams.m');
@@ -136,7 +137,7 @@ localPositionPsi = rad2deg(localPositionEuler(1));
 localPositionTheta = rad2deg(localPositionEuler(2));
 localPositionPhi = rad2deg(localPositionEuler(3));
 
-logFlag = 0;
+logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 VIOLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/VIO_' dateString '.log'];
 localPositionLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/localPosition_' dateString '.log'];
@@ -144,7 +145,7 @@ if useLidarFlag
     lidarLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/lidar_' dateString '.log'];
 end
 stateEstimateLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/stateEstimate_' dateString '.log'];
-WaypointLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/WaypointLogs' '/WaypointLog_' dateString '.log'];
+WaypointLog = ['~/Terpcopter4.0/Logs/Waypoint_logs' '/WaypointLog_' dateString '.log'];
 tic
 
 %MOVE TO PARAMS
@@ -155,11 +156,13 @@ lastWaypointX = zeros(500,1);
 lastWaypointY = zeros(500,1);
 lastWaypointZ = zeros(500,1);
 t = 0;
-LogWaypoints = 0; % 1=on 0=off | Turns logging on or off
+LogWaypoints = 1; % 1=on 0=off | Turns logging on or off
 Discretation_log = 1; %Set to either Time=1 or Distance=0
-TimeInterval = 0.5; %Time span between waypoint logging in seconds.
+TimeInterval = 1; %Time span between waypoint logging in seconds.
 DistanceInterval = 0.5; %Distance between waypoint logging in methers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+debugLevel = 1;
 
 while(1)
     tic
@@ -170,6 +173,7 @@ while(1)
     end
     VIOMsg = VIODataSubscriber.LatestMessage;
     localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
+    
     
     %% Pixhawk IMU
     if isempty(imuMsg)
@@ -236,7 +240,7 @@ while(1)
     stateMsg.Range = round(stateMsg.Range,2);
     %change Up to the estimated output from the filter instead of from the
     %range
-%     stateMsg.Up = stateMsg.Range;  %%%%%Changing to VIO Alt to Test CSV
+    %     stateMsg.Up = stateMsg.Range;  %%%%%Changing to VIO Alt to Test CSV
     %disp(stateMsg.Up);
     %stateMsg.Yaw = state.psi_inertial;
     stateMsg.Yaw = state.psi_relative;
@@ -302,15 +306,15 @@ while(1)
     localPositionTwistLinearVelocityY = localPositionOdomMsg.Twist.Twist.Linear.Y;
     localPositionTwistLinearVelocityZ = localPositionOdomMsg.Twist.Twist.Linear.Z;
     
-%     stateMsg.xVelocity = localPositionTwistLinearVelocityX;
-%     stateMsg.yVelocity = localPositionTwistLinearVelocityY;
-%     stateMsg.zVelocity = localPositionTwistLinearVelocityZ;
+    %     stateMsg.xVelocity = localPositionTwistLinearVelocityX;
+    %     stateMsg.yVelocity = localPositionTwistLinearVelocityY;
+    %     stateMsg.zVelocity = localPositionTwistLinearVelocityZ;
     
     localPositionTwistAngularVelocityX = localPositionOdomMsg.Twist.Twist.Angular.X;
     localPositionTwistAngularVelocityY = localPositionOdomMsg.Twist.Twist.Angular.Y;
     localPositionTwistAngularVelocityZ = localPositionOdomMsg.Twist.Twist.Angular.Z;
     
-
+    pFile5 = fopen(WaypointLog, 'a');
     
     if ( logFlag )
         pFile2 = fopen(VIOLog, 'a');
@@ -319,7 +323,6 @@ while(1)
             pFile3 = fopen(lidarLog, 'a');
         end
         pFile4 = fopen(stateEstimateLog, 'a');
-        pFile5 = fopen(WaypointLog, 'a');
         
         % write csv file Local Position
         fprintf(pFile1,'%6.6f,',localPositionTime);
@@ -370,7 +373,7 @@ while(1)
         fprintf(pFile4,'%6.6f,',stateMsg.North);       % Y axis
         fprintf(pFile4,'%6.6f\n',stateMsg.Up);         % Z axis
         
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Write CSV File for Waypoint Log
         if LogWaypoints == 1
             if Discretation_log==1 % Time Discretation
@@ -381,12 +384,12 @@ while(1)
                     fprintf(pFile5,'%6.6f,',localPositionZ);
                     fprintf(pFile5,'%6.6f\n',t);
                     if ~isempty(t_lastWaypoint(k))
-                    t_lastWaypoint(k) = t;
+                        t_lastWaypoint(k) = t;
                     end
-                      % Useful for Debugging
-%                     fprintf('Time Elapsed: %6.6f\n',t)
-%                     fprintf('Time Last: %6.6f\n',t_lastWaypoint(k))
-                end       
+                    % Useful for Debugging
+                    %                     fprintf('Time Elapsed: %6.6f\n',t)
+                    %                     fprintf('Time Last: %6.6f\n',t_lastWaypoint(k))
+                end
             end
             if Discretation_log==0 % Distance Discretation
                 DistanceTraveled=sqrt((localPositionX-lastWaypointX(k))^2+(localPositionY-lastWaypointY(k))^2+(localPositionZ-lastWaypointZ(k))^2);
@@ -398,10 +401,10 @@ while(1)
                     fprintf(pFile5,'%6.6f\n',t);
                     if ~isempty(lastWaypointX(k))
                         lastWaypointX(k) = localPositionX;
-                    end 
+                    end
                     if ~isempty(lastWaypointY(k))
                         lastWaypointY(k) = localPositionY;
-                    end 
+                    end
                     if ~isempty(lastWaypointZ(k))
                         lastWaypointZ(k) = localPositionZ;
                     end
@@ -410,7 +413,7 @@ while(1)
                 end
             end
         end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         fclose(pFile1);
         fclose(pFile2);
@@ -441,12 +444,13 @@ while(1)
     fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Up);
     fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Range);
     fprintf('LoopRate Hz: %03d\n',round(1/toc) )
-      
-        
+    
+    
     
     
     % publish stateEstimate
     send(stateEstimatePublisher, stateMsg);
-    
+    disp('Sending stateMsg:')
+    stateMsg
 end
 

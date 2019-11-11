@@ -34,6 +34,9 @@
 % targetPixelY = -640 to 640
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% liveplot toggle
+Liveplot_toggle = 0; %Set to 1 for on
+
 % prepare workspace
 clear; close all; clc; format compact;
 addpath('../')
@@ -73,9 +76,10 @@ end
 % mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
 % mission = loadMission_takeoffHoverWaypointLand();
-mission = loadMission_takeoffHoverWaypointSquareLand();
-% mission = loadMission_followCSVWaypoints();
-% mission = loadMission_CSVTest()
+ mission = loadMission_takeoffHoverWaypointSquareLand();
+% mission = loadMission_followCSVWaypoints(); %Doesn't work
+% mission = loadMission_CSVTest();
+% mission = loadMission_takeoffHoverWaypoint3D();
 fprintf('Launching Autonomy Node...\n');
 
 global timestamps
@@ -160,6 +164,23 @@ riverLog = [params.env.matlabRoot '/river_' dateString '.log'];
 timeForPlot = tic;
 numBhvs = length( mission.bhv );
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% if (Liveplot_toggle == 1)
+% wpt_fig_h = figure(1);
+% x = 0;
+% y = 0;
+% z = 0;
+% plot3(x,y,z)
+% xlim([-5 5])
+% ylim([-5 5])
+% zlim([0 5])
+% xlabel('X Position')
+% ylabel('Y Position')
+% zlabel('Z Position')
+% set(gcf,  'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+% linkdata on
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ( strcmp(params.auto.mode,'auto'))
     send(ayprCmdPublisher, ayprCmdMsg);
     send(servoSwitchCmdPublisher, servoSwitchMsg);
@@ -295,14 +316,43 @@ if ( strcmp(params.auto.mode,'auto'))
                     completionFlag = bhv_waypoint(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
                     completionFlag = bhv_land(completion, bhvTime);
-                case 'bhv_FollowCSVWaypoints'
-                    [completionFlag,ayprCmd] = bhv_FollowCSVWaypoints(stateEstimateMsg,ayprCmd,completion,t);
+%                 case 'bhv_FollowCSVWaypoints'
+%                     [completionFlag,ayprCmd] = bhv_FollowCSVWaypoints(stateEstimateMsg,ayprCmd,completion,t);
                 case 'bhv_CSVTest'
                     [completionFlag, ayprCmd] = bhv_CSVTest(stateEstimateMsg, ayprCmd, completion, t);
+                case 'bhv_waypoint3D'
+                    completionFlag = bhv_waypoint3D(stateEstimateMsg, ayprCmd, completion, t);
                 otherwise
             end
             mission.bhv{1}.completion.status = completionFlag;
         end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%         if (Liveplot_toggle == 1)
+%         if (mission.config.Liveplot_firstloop == 1)
+%             for (i=1:mission.config.FinalWaypoint)
+%             hold on
+%             plot3(mission.config.waypoint_x(i),mission.config.waypoint_y(i),mission.config.waypoint_z(i),'Marker','d','MarkerFaceColor','green')
+%             end
+%             mission.config.Liveplot_firstloop = false;
+%         end
+%         if (mission.config.Liveplot_toggle == 1)
+%             %Desired Waypoint
+%             hold on
+%             plot3(ayprCmd.WaypointXDesiredMeters,ayprCmd.WaypointYDesiredMeters,ayprCmd.AltDesiredMeters,'Marker','o','MarkerFaceColor','blue','Linewidth',2,'MarkerSize',5)
+%             hold on
+%             %Current Position
+%             plot3(stateEstimateMsg.East,stateEstimateMsg.North,stateEstimateMsg.Up,'Marker','x','MarkerFaceColor','red')
+%             hold on
+%             grid on
+%             %Condition Satisfaction Sphere
+%             [x y z] = sphere;
+%             a=[ayprCmd.WaypointXDesiredMeters ayprCmd.WaypointYDesiredMeters ayprCmd.AltDesiredMeters mission.config.toleranceMeters];
+%             s1=surf(x*a(1,4)+a(1,1),y*a(1,4)+a(1,2),z*a(1,4)+a(1,3),'FaceAlpha',0.25,'FaceColor',[0 0 1],'EdgeColor','none');
+%             hold off
+%         end
+%         end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % publish
         if ( currentBehavior > numBhvs )

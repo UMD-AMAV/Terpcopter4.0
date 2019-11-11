@@ -34,7 +34,7 @@ end
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 ayprCmdSubscriber = rossubscriber('/ayprCmd');
-% controlStartSubscriber = rossubscriber('/startControl', 'std_msgs/Bool');
+controlStartSubscriber = rossubscriber('/startControl', 'std_msgs/Bool');
 
 % Publishers
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
@@ -52,7 +52,7 @@ stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
 
-% initialize altiude controller state
+% initialize altitude controller state
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 altControl.log=[params.env.matlabRoot '/altControl_' dateString '.log'];
 altControl.lastTime = 0;
@@ -92,10 +92,10 @@ send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
 
 disp('Waiting for Start...')
-% controlStartFlag = controlStartSubscriber.LatestMessage;
-% while ( ~controlStartFlag.Data )
-%     controlStartFlag = controlStartSubscriber.LatestMessage;
-% end
+controlStartFlag = controlStartSubscriber.LatestMessage;
+while ( ~controlStartFlag.Data )
+    controlStartFlag = controlStartSubscriber.LatestMessage;
+end
 disp('Entering loop...');
 
 while(1)
@@ -167,8 +167,9 @@ while(1)
 %         [u_yaw, u_pitch, u_roll,yawControl,pitchControl, rollControl] = VelocityPID(yawControl,pitchControl, rollControl, t, yawDeg, x_d, x, y_d, y);
         
         %[u_yaw, u_pitch, u_roll, yawControl] = waypointPointAndMoveForwardController(yawControl, t, yawDeg, x_d, x, y_d, y);
-        %[u_yaw, u_pitch, u_roll] = waypointForwardCrabController(t, yawDeg, x_d, x, y_d, y);
-        [u_yaw, u_pitch, u_roll, yawControl] = waypointHybridController(yawControl, t, yawDeg, x_d, x, y_d, y);
+         [u_yaw, u_pitch, u_roll] = waypointForwardCrabController(t, yawDeg, x_d, x, y_d, y);
+        %[u_yaw, u_pitch, u_roll, u_alt] = waypoint3DController(t, yawDeg, x_d, x, y_d, y, z_d, z);
+        %[u_yaw, u_pitch, u_roll, yawControl] = waypointHybridController(yawControl, t, yawDeg, x_d, x, y_d, y);
         
         % Note: Previous waypoint controls. Should be kept until
         % waypointPointAndMoveForwardController,
