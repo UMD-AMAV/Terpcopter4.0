@@ -60,4 +60,5 @@ This publishes data on folllowing topics:
  - /tag_detections: the same information as provided by the /tf topic but as a custom message carrying the tag ID(s), size(s) and geometry_msgs/PoseWithCovarianceStamped pose information
  - /tag_detections_image: the same image as input by /camera/image_rect but with the detected tags highlighted.
  
+The package uses tag25h9 family tags.A sample `25h9` tag image (tag size is 0.180m on a letter size paper) pdf can be downloaded [here](./tag25h9.pdf)
 
