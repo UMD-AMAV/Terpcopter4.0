@@ -12,7 +12,7 @@ cd ..
 catkin_make
 ```
 
-Apriltag ros package requires rectified camera images and camera parameters. To publish images for depth camera, install the realsense-ros package as shown below:
+Apriltag ros package requires rectified camera images and camera parameters. To publish images from depth camera, install the realsense-ros package as shown below:
 
 ## Build Instructions for Intel RealSense ROS wrapper
 
