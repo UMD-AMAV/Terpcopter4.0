@@ -1,6 +1,6 @@
 function completionFlag = bhv_waypoint(stateEstimateMsg, ayprCmd, completion, t )
     global timestamps
-    toleranceMeters = 0.25;
+    toleranceMeters = 1.5; %0.25;
     
     waypointXComplete = abs(ayprCmd.WaypointXDesiredMeters - stateEstimateMsg.East) <= toleranceMeters;
     waypointYComplete = abs(ayprCmd.WaypointYDesiredMeters - stateEstimateMsg.North) <= toleranceMeters;
