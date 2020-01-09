@@ -1,0 +1,16 @@
+float32 altDesiredMeters
+float32 yawDesiredDegrees
+float32 pitchDesiredDegrees
+float32 rollDesiredDegrees
+float32 uDesiredMetersPerSecond
+float32 vDesiredMetersPerSecond
+float32 waypointXDesiredMeters
+float32 waypointYDesiredMeters
+bool altSwitch
+bool yawSwitch
+bool pitchSwitch
+bool rollSwitch
+bool uSwitch
+bool vSwitch
+bool waypointSwitch
+string waypointType
