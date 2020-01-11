@@ -54,8 +54,10 @@ message_generation
    ayprCmd.msg
    stateEstimate.msg
    stickCmd.msg
+   ffpidSetting.msg
    targetDetection.msg
    openLoopStickCmd.msg
+   altControlDebug.msg
    servoSwitchCmd.msg
  )
 
