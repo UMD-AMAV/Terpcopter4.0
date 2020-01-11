@@ -43,6 +43,7 @@ if useLidarFlag
 end
 VIODataSubscriber = rossubscriber('/camera/odom/sample', 'nav_msgs/Odometry');
 localPositionOdomSubscriber = rossubscriber('/mavros/local_position/odom', 'nav_msgs/Odometry');
+
 % ARTagSubscriber = rossubscriber('/tag_detections', 'apriltag_ros/AprilTagDetectionArray');
 
 % Publishers
@@ -78,6 +79,7 @@ if useLidarFlag
 end
 VIOMsg = VIODataSubscriber.LatestMessage;
 localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
+
 % ARTagMsg = ARTagSubscriber.LatestMessage;
 
 %% Pixhawk IMU
@@ -100,7 +102,6 @@ inertial_yaw_initial = state.psi_inertial;
 %% VIO Odometry
 % VIO Time
 VIOTime = VIOMsg.Header.Stamp.Sec;
-VIOTimeNSec = VIOMsg.Header.Stamp.Nsec;
 % VIO Pose
 % Position
 VIOPositionX = VIOMsg.Pose.Pose.Position.X;
@@ -122,7 +123,6 @@ VIOphi = rad2deg(VIOeuler(3));
 %% Local Position Odometry
 % Local Position Time
 localPositionTime = localPositionOdomMsg.Header.Stamp.Sec;
-localPositionTimeNSec = localPositionOdomMsg.Header.Stamp.Nsec;
 % Local Position Pose
 % Position
 localPositionX = localPositionOdomMsg.Pose.Pose.Position.X;
@@ -153,8 +153,6 @@ localPositionPhi = rad2deg(localPositionEuler(3));
 % }
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 VIOLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/VIO_' dateString '.log'];
@@ -163,28 +161,27 @@ if useLidarFlag
     lidarLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/lidar_' dateString '.log'];
 end
 stateEstimateLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/stateEstimate_' dateString '.log'];
-% WaypointLog = ['~/Terpcopter4.0/Logs/Waypoint_logs' '/WaypointLog_' dateString '.log'];
+WaypointLog = ['~/Terpcopter4.0/Logs/Waypoint_logs' '/WaypointLog_' dateString '.log'];
 tic
 
 %MOVE TO PARAMS
 %Initialization for Waypoint Flight Log
-% k = 1;
-% t_lastWaypoint = zeros(500,1);
-% lastWaypointX = zeros(500,1);
-% lastWaypointY = zeros(500,1);
-% lastWaypointZ = zeros(500,1);
-% t = 0;
-% LogWaypoints = 1; % 1=on 0=off | Turns logging on or off
-% Discretation_log = 1; %Set to either Time=1 or Distance=0
-% TimeInterval = 1; %Time span between waypoint logging in seconds.
-% DistanceInterval = 0.5; %Distance between waypoint logging in methers.
+k = 1;
+t_lastWaypoint = zeros(500,1);
+lastWaypointX = zeros(500,1);
+lastWaypointY = zeros(500,1);
+lastWaypointZ = zeros(500,1);
+t = 0;
+LogWaypoints = 1; % 1=on 0=off | Turns logging on or off
+Discretation_log = 1; %Set to either Time=1 or Distance=0
+TimeInterval = 1; %Time span between waypoint logging in seconds.
+DistanceInterval = 0.5; %Distance between waypoint logging in methers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 debugLevel = 1;
 
 while(1)
     tic
-    pause(eps);
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     if useLidarFlag
@@ -268,9 +265,7 @@ while(1)
     
     %% VIO Odometry
     % VIO Time
-    VIOTime = VIOMsg.Header.Stamp.Sec;
-    VIOTimeNSec = VIOMsg.Header.Stamp.Nsec;
-    VIOTimeLog = double(VIOTime) + double(VIOTimeNSec)*10^-9;
+    VIOTime = VIOMsg.Header.Stamp.Nsec;
     % VIO Pose
     % Position
     VIOPositionX = VIOMsg.Pose.Pose.Position.X;
@@ -334,7 +329,7 @@ while(1)
     localPositionTwistAngularVelocityX = localPositionOdomMsg.Twist.Twist.Angular.X;
     localPositionTwistAngularVelocityY = localPositionOdomMsg.Twist.Twist.Angular.Y;
     localPositionTwistAngularVelocityZ = localPositionOdomMsg.Twist.Twist.Angular.Z;
-    
+
 %     pFile5 = fopen(WaypointLog, 'a');
 %    artaglog = fopen(ARTagLog,'a');
     if ( logFlag )
@@ -371,7 +366,7 @@ while(1)
         
         
         % write csv file Realsense VIO
-        fprintf(pFile2,'%6.6f,',VIOTimeLog);
+        fprintf(pFile2,'%6.6f,',VIOTime);
         
         fprintf(pFile2,'%6.6f,',VIOPositionX);
         fprintf(pFile2,'%6.6f,',VIOPositionY);
@@ -401,46 +396,46 @@ while(1)
         fprintf(pFile4,'%6.6f\n',stateMsg.Up);         % Z axis
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%         % Write CSV File for Waypoint Log
-%         if LogWaypoints == 1
-%             if Discretation_log==1 % Time Discretation
-%                 if t > (t_lastWaypoint(k) + TimeInterval)
-%                     k = k+1;
-%                     fprintf(pFile5,'%6.6f,',localPositionX);
-%                     fprintf(pFile5,'%6.6f,',localPositionY);
-%                     fprintf(pFile5,'%6.6f,',localPositionZ);
-%                     fprintf(pFile5,'%6.6f\n',t);
-%                     if ~isempty(t_lastWaypoint(k))
-%                         t_lastWaypoint(k) = t;
-%                     end
-%                     % Useful for Debugging
-%                     %                     fprintf('Time Elapsed: %6.6f\n',t)
-%                     %                     fprintf('Time Last: %6.6f\n',t_lastWaypoint(k))
-%                 end
-%             end
-%             if Discretation_log==0 % Distance Discretation
-%                 DistanceTraveled=sqrt((localPositionX-lastWaypointX(k))^2+(localPositionY-lastWaypointY(k))^2+(localPositionZ-lastWaypointZ(k))^2);
-%                 if DistanceTraveled > DistanceInterval
-%                     k=k+1;
-%                     fprintf(pFile5,'%6.6f,',localPositionX);
-%                     fprintf(pFile5,'%6.6f,',localPositionY);
-%                     fprintf(pFile5,'%6.6f,',localPositionZ);
-%                     fprintf(pFile5,'%6.6f\n',t);
-%                     if ~isempty(lastWaypointX(k))
-%                         lastWaypointX(k) = localPositionX;
-%                     end
-%                     if ~isempty(lastWaypointY(k))
-%                         lastWaypointY(k) = localPositionY;
-%                     end
-%                     if ~isempty(lastWaypointZ(k))
-%                         lastWaypointZ(k) = localPositionZ;
-%                     end
-%                     fprintf('Distance Traveled: %6.6f\n',DistanceTraveled)
-%                     fprintf('Current Waypoint: %6.6f\n',k)
-%                 end
-%             end
-%         end
-%         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Write CSV File for Waypoint Log
+        if LogWaypoints == 1
+            if Discretation_log==1 % Time Discretation
+                if t > (t_lastWaypoint(k) + TimeInterval)
+                    k = k+1;
+                    fprintf(pFile5,'%6.6f,',localPositionX);
+                    fprintf(pFile5,'%6.6f,',localPositionY);
+                    fprintf(pFile5,'%6.6f,',localPositionZ);
+                    fprintf(pFile5,'%6.6f\n',t);
+                    if ~isempty(t_lastWaypoint(k))
+                        t_lastWaypoint(k) = t;
+                    end
+                    % Useful for Debugging
+                    %                     fprintf('Time Elapsed: %6.6f\n',t)
+                    %                     fprintf('Time Last: %6.6f\n',t_lastWaypoint(k))
+                end
+            end
+            if Discretation_log==0 % Distance Discretation
+                DistanceTraveled=sqrt((localPositionX-lastWaypointX(k))^2+(localPositionY-lastWaypointY(k))^2+(localPositionZ-lastWaypointZ(k))^2);
+                if DistanceTraveled > DistanceInterval
+                    k=k+1;
+                    fprintf(pFile5,'%6.6f,',localPositionX);
+                    fprintf(pFile5,'%6.6f,',localPositionY);
+                    fprintf(pFile5,'%6.6f,',localPositionZ);
+                    fprintf(pFile5,'%6.6f\n',t);
+                    if ~isempty(lastWaypointX(k))
+                        lastWaypointX(k) = localPositionX;
+                    end
+                    if ~isempty(lastWaypointY(k))
+                        lastWaypointY(k) = localPositionY;
+                    end
+                    if ~isempty(lastWaypointZ(k))
+                        lastWaypointZ(k) = localPositionZ;
+                    end
+                    fprintf('Distance Traveled: %6.6f\n',DistanceTraveled)
+                    fprintf('Current Waypoint: %6.6f\n',k)
+                end
+            end
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         fclose(pFile1);
         fclose(pFile2);
@@ -448,9 +443,11 @@ while(1)
             fclose(pFile3);
         end
         fclose(pFile4);
-%         fclose(pFile5);
+        fclose(pFile5);
     end
+
 %     fclose(artaglog);
+
     % timestamp
     ti= rostime('now');
     abs_t = eval([int2str(ti.Sec) '.' ...
