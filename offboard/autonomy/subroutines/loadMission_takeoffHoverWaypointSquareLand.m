@@ -31,43 +31,7 @@ i = i + 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
-mission.bhv{i}.completion.status = false;     % completion flag
-
-i = i + 1;
-% Behavior 3: Waypoint
-mission.bhv{i}.name = 'bhv_waypoint';
-mission.bhv{i}.ayprCmd = default_aypr_msg();
-mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1;
-mission.bhv{i}.ayprCmd.WaypointSwitch = 1;
-mission.bhv{i}.ayprCmd.WaypointXDesiredMeters = 0;
-mission.bhv{i}.ayprCmd.WaypointYDesiredMeters = 1.5;
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
-mission.bhv{i}.completion.status = false;     % completion flag
-
-i = i + 1;
-% Behavior 3: Waypoint
-mission.bhv{i}.name = 'bhv_waypoint';
-mission.bhv{i}.ayprCmd = default_aypr_msg();
-mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1;
-mission.bhv{i}.ayprCmd.WaypointSwitch = 1;
-mission.bhv{i}.ayprCmd.WaypointXDesiredMeters = 1.5;
-mission.bhv{i}.ayprCmd.WaypointYDesiredMeters = 1.5;
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
-mission.bhv{i}.completion.status = false;     % completion flag
-
-i = i + 1;
-% Behavior 3: Waypoint
-mission.bhv{i}.name = 'bhv_waypoint';
-mission.bhv{i}.ayprCmd = default_aypr_msg();
-mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1;
-mission.bhv{i}.ayprCmd.WaypointSwitch = 1;
-mission.bhv{i}.ayprCmd.WaypointXDesiredMeters = 1.5;
-mission.bhv{i}.ayprCmd.WaypointYDesiredMeters = 0;
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1.21; 
 mission.bhv{i}.completion.durationSec = 5; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
@@ -80,6 +44,18 @@ mission.bhv{i}.ayprCmd.AltDesiredMeters = 1;
 mission.bhv{i}.ayprCmd.WaypointSwitch = 1;
 mission.bhv{i}.ayprCmd.WaypointXDesiredMeters = 0;
 mission.bhv{i}.ayprCmd.WaypointYDesiredMeters = 0;
+mission.bhv{i}.completion.durationSec = 5; % 10 seconds
+mission.bhv{i}.completion.status = false;     % completion flag
+
+i = i + 1;
+% Behavior 3: Waypoint
+mission.bhv{i}.name = 'bhv_waypoint';
+mission.bhv{i}.ayprCmd = default_aypr_msg();
+mission.bhv{i}.ayprCmd.AltSwitch = 1; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1;
+mission.bhv{i}.ayprCmd.WaypointSwitch = 1;
+mission.bhv{i}.ayprCmd.WaypointXDesiredMeters = 0;
+mission.bhv{i}.ayprCmd.WaypointYDesiredMeters = 3;
 mission.bhv{i}.completion.durationSec = 5; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
