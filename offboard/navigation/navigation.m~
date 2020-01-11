@@ -43,7 +43,7 @@ if useLidarFlag
 end
 VIODataSubscriber = rossubscriber('/camera/odom/sample', 'nav_msgs/Odometry');
 localPositionOdomSubscriber = rossubscriber('/mavros/local_position/odom', 'nav_msgs/Odometry');
-% ARTagSubscriber = rossubscriber('/tag_detections', 'apriltag_ros/AprilTagDetectionArray');
+ARTagSubscriber = rossubscriber('/tag_detections', 'apriltag_ros/AprilTagDetectionArray');
 
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
@@ -78,7 +78,7 @@ if useLidarFlag
 end
 VIOMsg = VIODataSubscriber.LatestMessage;
 localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
-% ARTagMsg = ARTagSubscriber.LatestMessage;
+ARTagMsg = ARTagSubscriber.LatestMessage;
 
 %% Pixhawk IMU
 w = imuMsg.Orientation.W;
@@ -336,12 +336,12 @@ while(1)
     localPositionTwistAngularVelocityZ = localPositionOdomMsg.Twist.Twist.Angular.Z;
     
 %     pFile5 = fopen(WaypointLog, 'a');
-%    artaglog = fopen(ARTagLog,'a');
+    artaglog = fopen(ARTagLog,'a');
     if ( logFlag )
         %% ar tag logging
 
-%         fprintf(artaglog,'%6.6f',ARTagPosition);
-%         fprintf(artaglog,'%6.6f',ARTagOrientation);
+        fprintf(artaglog,'%6.6f',ARTagPosition);
+        fprintf(artaglog,'%6.6f',ARTagOrientation);
         
         
         pFile2 = fopen(VIOLog, 'a');
@@ -450,7 +450,7 @@ while(1)
         fclose(pFile4);
 %         fclose(pFile5);
     end
-%     fclose(artaglog);
+    fclose(artaglog);
     % timestamp
     ti= rostime('now');
     abs_t = eval([int2str(ti.Sec) '.' ...
